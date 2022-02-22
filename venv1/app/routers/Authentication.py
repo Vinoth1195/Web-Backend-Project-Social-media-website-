@@ -10,15 +10,20 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 router = APIRouter()
 
 
-@router.post("/login")
+@router.post("/login", status_code=status.HTTP_200_OK)
 def login(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     userinfo= db.query(models.Users).filter(models.Users.email==user.username).first()
 
     if not userinfo:
-        return "Invalid Credentials"
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid Credentials")
+
 
     elif not utils.verifypassword(user.password, userinfo.password):
-        return "Invalid Credentials"
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid Credentials")
+
+        
     else:
         token=oauth2.create_access_token({"userid":userinfo.id})
         return {"access_token":token, "token_type":"bearer"}

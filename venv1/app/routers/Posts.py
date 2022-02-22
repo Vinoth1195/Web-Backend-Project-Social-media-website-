@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.get("/allposts", response_model= List[ReturnAllPosts])
-def getposts2(db: Session = Depends(get_db), current_user: int = Depends(oauth2.fetch_user), limit: int = 3, skip: int= 0, search: Optional[str]="" ):
+def getposts2(db: Session = Depends(get_db), current_user: int = Depends(oauth2.fetch_user), limit: int = 100, skip: int= 0, search: Optional[str]="" ):
     allposts=db.query(models.Posts2, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Posts2.id == models.Vote.post_id, isouter=True).group_by(models.Posts2.id).filter(models.Posts2.title.contains(search)).limit(limit).offset(skip).all()
     return allposts
 

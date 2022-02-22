@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from fastapi import APIRouter,Depends,HTTPException, routing,status
 import fastapi
 from ..databaseintialize import get_db
@@ -8,7 +9,7 @@ from ..utils import hashpassword, verifypassword
 from .. import oauth2
 router = APIRouter(prefix="/users")
 
-@router.post("/create", response_model= UserCreated )
+@router.post("/create", response_model= UserCreated, status_code=status.HTTP_201_CREATED )
 def createuser(user: Users, db: Session = Depends(get_db)):
     user.password= hashpassword(user.password)
     new_user=user.dict()
